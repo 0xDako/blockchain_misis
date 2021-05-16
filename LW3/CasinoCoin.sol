@@ -18,6 +18,8 @@ contract CasinoCoin {
 
     address payable public owner_address;
 
+    address[] games = new address[](0);  
+
     // курс обмена eth -> CasinoCoin
     uint256 direct_exchange_rate = 1000;
     // курс обмена CasinoCoin-> eth
@@ -26,6 +28,14 @@ contract CasinoCoin {
     modifier owner_only() { 
      require(msg.sender == owner_address, "error-only-owner"); 
      _;
+    }
+    
+    modifier games_only() { 
+        bool is_game = false;
+        for(uint256 i = 0; i < games.length; ++i)
+            if(games[i] == msg.sender) is_game = true;
+        require(is_game, "msg.sender is not a game");
+        _;
     }
     
     constructor() {
@@ -108,4 +118,20 @@ contract CasinoCoin {
         payable(msg.sender).transfer(value/reverse_exchange_rate);
     }
 
+    function AddGame(address new_game) public owner_only
+    {
+        address[] memory new_games = new address[](games.length+1);
+        for(uint256 i = 0; i < games.length; ++i)
+        {
+            new_games[i] = games[i];
+        }
+        new_games[games.length] = new_game;
+        games = new_games;
+    }
+    
+    function Emit(address _to, uint256 value) public games_only
+    {
+        balanceOf[_to] += value;
+        totalSupply += value;
+    }
 }
