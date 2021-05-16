@@ -3,7 +3,7 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "contracts/CasinoCoin.sol";
 
-contract Roulette {
+contract RouletteCC {
     
     address public owner_address;
     address public last_player_address;
