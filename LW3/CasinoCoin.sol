@@ -6,7 +6,7 @@ contract CasinoCoin {
 
     string public name = "CasinoCoin"; // Название алькоина
     string public symbol = "CC"; // Аббривиатура
-    uint8 public decimals = 2; // Количество знаков после запятой
+    uint8 public decimals = 0; // Количество знаков после запятой
 
     uint256 public totalSupply = 0; // Количество выпущенных монет
 
@@ -94,6 +94,16 @@ contract CasinoCoin {
         return true;
     }
 
+    function GetBalance(address target) public view returns(uint256)
+    {
+        return balanceOf[target];
+    }
+
+    function GetAllowed(address from, address to) public view returns(uint256)
+    {
+        return allowance[from][to];
+    }
+
     function set_direct_exchange_rate(uint256 target_value) public owner_only
     {
         direct_exchange_rate = target_value;    
@@ -128,7 +138,7 @@ contract CasinoCoin {
         new_games[games.length] = new_game;
         games = new_games;
     }
-    
+
     function Emit(address _to, uint256 value) public games_only
     {
         balanceOf[_to] += value;
