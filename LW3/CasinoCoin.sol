@@ -1,6 +1,11 @@
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.6.0 <0.9.0;
 
 //алькоин на основе стандарта ERC20
+
+//  let coin = await CasinoCoin.deployed()
+//  coin.ExchangeEth({value: web3.utils.toWei('1', 'ether'), from: accounts[0]})
+//  coin.approve('address-roulette', 10000)
+//  coin.AddGame('address-roulette')
 
 contract CasinoCoin {
 
@@ -20,9 +25,9 @@ contract CasinoCoin {
 
     address[] games = new address[](0);  
 
-    // курс обмена eth -> CasinoCoin
+    // курс обмена 1 eth -> CasinoCoin
     uint256 direct_exchange_rate = 1000;
-    // курс обмена CasinoCoin-> eth
+    // курс обмена CasinoCoin->  1 eth
     uint256 reverse_exchange_rate = 1100;
 
     modifier owner_only() { 
@@ -38,7 +43,7 @@ contract CasinoCoin {
         _;
     }
     
-    constructor() {
+    constructor() public {
         owner_address = payable(msg.sender);
     }
 
@@ -116,7 +121,7 @@ contract CasinoCoin {
 
     function ExchangeEth() public payable
     {
-        balanceOf[msg.sender] += direct_exchange_rate*msg.value;
+        balanceOf[msg.sender] = balanceOf[msg.sender] + msg.value*direct_exchange_rate;      
         totalSupply += direct_exchange_rate*msg.value;
     } 
 
