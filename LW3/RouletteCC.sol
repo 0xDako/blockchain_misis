@@ -31,8 +31,9 @@ contract RouletteCC {
 
     function send_win(address to, uint256 value) private 
     {
-        token.Emit(to, value);
+        token.mint(to, value);
     }
+    
     function take_lose(address from, uint256 value) private 
     {
         token.burnFrom(from, value);
@@ -77,6 +78,7 @@ contract RouletteCC {
             emit PlayTheGame(msg.sender, value, "Black", true);
             return "You won! Congratulations!";
         }
+        take_lose(msg.sender, value);
         emit PlayTheGame(msg.sender, value, "Black", false);
         return "You lose. Try again.";
     }
@@ -91,6 +93,7 @@ contract RouletteCC {
             emit PlayTheGame(msg.sender, value, "BetOnNumber", true);
             return "You won! Congratulations!";
         }
+        take_lose(msg.sender, value);
         emit PlayTheGame(msg.sender, value, "BetOnNumber", false);
         return "You lose. Try again.";
     }
@@ -104,11 +107,12 @@ contract RouletteCC {
             emit PlayTheGame(msg.sender, value, "LowerHalf", true);
             return "You won! Congratulations!";
         }
+        take_lose(msg.sender, value);
         emit PlayTheGame(msg.sender, value, "LowerHalf", false);
         return "You lose. Try again.";
     }
 
-    function UpperHalf() public payable returns(string memory){
+    function UpperHalf(uint256 value) public payable returns(string memory){
         last_player_address = payable(msg.sender);
         last_win_num = random();
         if (last_win_num >= 19 ) {
@@ -116,11 +120,12 @@ contract RouletteCC {
             emit PlayTheGame(msg.sender, value, "UpperHalf", true);
             return "You won! Congratulations!";
         }
+        take_lose(msg.sender, value);
         emit PlayTheGame(msg.sender, value, "UpperHalf", false);
         return "You lose. Try again.";
     }
 
-    function Odd() public payable  returns(string memory){
+    function Odd(uint256 value) public payable  returns(string memory){
 
         last_player_address = payable(msg.sender);
         last_win_num = random();
@@ -130,11 +135,12 @@ contract RouletteCC {
             emit PlayTheGame(msg.sender, value, "Odd", true);
             return "You won! Congratulations!";
         }
+        take_lose(msg.sender, value);
         emit PlayTheGame(msg.sender, value, "Odd", false);
         return "You lose. Try again.";
     }
 
-    function NoOdd() public payable  returns(string memory){
+    function NoOdd(uint256 value) public payable  returns(string memory){
 
         last_player_address = payable(msg.sender);
         last_win_num = random();
@@ -144,6 +150,7 @@ contract RouletteCC {
             emit PlayTheGame(msg.sender, value, "NoOdd", true);
             return "You won! Congratulations!";
         }
+         take_lose(msg.sender, value);
         emit PlayTheGame(msg.sender, value, "NoOdd", false);
         return "You lose. Try again.";
     }

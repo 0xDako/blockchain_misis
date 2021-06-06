@@ -6,6 +6,7 @@ pragma solidity >=0.6.0 <0.9.0;
 //  coin.ExchangeEth({value: web3.utils.toWei('1', 'ether'), from: accounts[0]})
 //  coin.approve('address-roulette', 10000)
 //  coin.AddGame('address-roulette')
+//  CasinoCoin.deployed().then(function(instance) { return instance.(GetBalance('0x91abA0aD6F65CD3611b09e5C8f42c67Ee5b87d75')); }).then(function(bn) { return bn.toString() });
 
 contract CasinoCoin {
 
@@ -20,15 +21,17 @@ contract CasinoCoin {
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
+    event BuyCC(address indexed from, uint256 value);
+    event BuyETH(address indexed from, uint256 value);
 
     address payable public owner_address;
 
     address[] games = new address[](0);  
 
     // курс обмена 1 eth -> CasinoCoin
-    uint256 direct_exchange_rate = 1000;
+    uint256 direct_exchange_rate = 1000000000000000000;
     // курс обмена CasinoCoin->  1 eth
-    uint256 reverse_exchange_rate = 1100;
+    uint256 reverse_exchange_rate = 1000000000000000000;
 
     modifier owner_only() { 
      require(msg.sender == owner_address, "error-only-owner"); 
@@ -121,16 +124,19 @@ contract CasinoCoin {
 
     function ExchangeEth() public payable
     {
-        balanceOf[msg.sender] = balanceOf[msg.sender] + msg.value*direct_exchange_rate;      
-        totalSupply += direct_exchange_rate*msg.value;
+        balanceOf[msg.sender] = balanceOf[msg.sender] + msg.value/direct_exchange_rate;      
+        totalSupply += msg.value/direct_exchange_rate;
+        emit BuyCC(msg.sender, msg.value);
     } 
 
     function ExchangeCC(uint256 value) public
     {
-        require(address(this).balance >= value/reverse_exchange_rate, "Low contract balance");
+        require(address(this).balance >= value*reverse_exchange_rate, "Low contract balance");
         require(balanceOf[msg.sender] >= value, "Low user balace");
+        
         balanceOf[msg.sender] -= value;
-        payable(msg.sender).transfer(value/reverse_exchange_rate);
+        payable(msg.sender).transfer(value*reverse_exchange_rate);
+        emit BuyETH(msg.sender, value);
     }
 
     function AddGame(address new_game) public owner_only
@@ -144,9 +150,14 @@ contract CasinoCoin {
         games = new_games;
     }
 
-    function Emit(address _to, uint256 value) public games_only
+    function mint(address _to, uint256 value) public games_only
     {
         balanceOf[_to] += value;
         totalSupply += value;
+    }
+
+    function getGamesAddress() public view returns( address[] memory)
+    {
+        return games;
     }
 }
